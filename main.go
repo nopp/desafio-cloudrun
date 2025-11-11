@@ -84,7 +84,7 @@ func weatherHandler(w http.ResponseWriter, r *http.Request) {
 	defer respW.Body.Close()
 
 	if respW.StatusCode != http.StatusOK {
-		http.Error(w, "weather service error", http.StatusBadGateway)
+		http.Error(w, "can not find zipcode", http.StatusBadGateway)
 		return
 	}
 
