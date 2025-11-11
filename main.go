@@ -16,6 +16,7 @@ const (
 
 type cepInfo struct {
 	Localidade string `json:"localidade"`
+	Erro       bool   `json:"erro"`
 }
 
 type cityInfo struct {
@@ -47,7 +48,7 @@ func weatherHandler(w http.ResponseWriter, r *http.Request) {
 
 	cep := r.URL.Query().Get("cep")
 	if !isValidCEP(cep) {
-		http.Error(w, "cep must have exactly 8 digits", http.StatusUnprocessableEntity)
+		http.Error(w, "invalid zipcode", http.StatusUnprocessableEntity)
 		return
 	}
 
@@ -63,7 +64,10 @@ func weatherHandler(w http.ResponseWriter, r *http.Request) {
 
 	switch resp.StatusCode {
 	case http.StatusNotFound:
-		http.Error(w, "cep not found", http.StatusNotFound)
+		http.Error(w, "can not find zipcode", http.StatusNotFound)
+		return
+	case http.StatusBadRequest, http.StatusUnprocessableEntity:
+		http.Error(w, "invalid zipcode", http.StatusUnprocessableEntity)
 		return
 	case http.StatusOK:
 	default:
@@ -73,6 +77,10 @@ func weatherHandler(w http.ResponseWriter, r *http.Request) {
 
 	if err := json.NewDecoder(resp.Body).Decode(&cepInformation); err != nil {
 		http.Error(w, "invalid cep response", http.StatusBadGateway)
+		return
+	}
+	if cepInformation.Erro {
+		http.Error(w, "can not find zipcode", http.StatusNotFound)
 		return
 	}
 
