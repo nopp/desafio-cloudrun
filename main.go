@@ -16,7 +16,7 @@ const (
 
 type cepInfo struct {
 	Localidade string `json:"localidade"`
-	Erro       bool   `json:"erro"`
+	Erro       string `json:"erro"`
 }
 
 type cityInfo struct {
@@ -79,7 +79,7 @@ func weatherHandler(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, "invalid cep response", http.StatusBadGateway)
 		return
 	}
-	if cepInformation.Erro {
+	if cepInformation.Erro == "true" {
 		http.Error(w, "can not find zipcode", http.StatusNotFound)
 		return
 	}
