@@ -1,10 +1,9 @@
-FROM golang:1.23.1 AS builder
+FROM golang:1.25.1 AS builder
+WORKDIR /app
 COPY . .
-RUN unset GOPATH \
-    && CGO_ENABLED=0 GOOS=linux go build -a -installsuffix cgo -o main .
+RUN CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build -o main
 
 FROM scratch
-LABEL maintainer="Carlos Augusto Malucelli <camalucelli@gmail.com>"
-COPY --from=builder /go/main .
-RUN chmod +x main
+WORKDIR /app
+COPY --from=builder /app/main .
 ENTRYPOINT ["./main"]
